@@ -1,0 +1,14 @@
+﻿Base da Prova P1 - Express + MySQL + JWT + Swagger + Events + Dashboards/Admin
+
+- estrutura em camadas (routes/controllers/services/models/config)
+- Express com CORS, Helmet, JSON e /ping
+- MySQL (mysql2/promise), script create_db.sql + seed de 3 eventos
+- endpoints:
+  - GET /events (público)
+  - POST /auth/login (JWT)
+  - GET /dashboards (autenticado)
+  - GET /admin (role=admin)
+  - POST /events (admin) – validação básica
+- documentação Swagger em /api-docs (bearerAuth) + JSDoc nas rotas
+- request/events.rest para testes
+- .env.example e .gitignore adicionados

@@ -1,0 +1,50 @@
+﻿@baseURL = http://localhost:3000
+
+### Listar eventos
+GET {{baseURL}}/events
+Accept: application/json
+
+### Swagger
+GET {{baseURL}}/api-docs
+
+### Health-check
+GET {{baseURL}}/ping
+
+### Login como admin
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ifrs.edu",
+  "password": "123456"
+}
+
+### 👉 Cole o token no @token abaixo
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU4MTU0MjQwLCJleHAiOjE3NTgxNTc4NDB9.7POTb-4wEFX_bCBkrpiDnEfGqbGj6AgZXm9z6epOHGg
+
+### Criar evento (admin)
+POST {{baseURL}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Feira de Adoção",
+  "description": "Cães e gatos no ginásio municipal",
+  "event_date": "2025-10-26 09:00:00",
+  "location": "Ginásio Municipal",
+  "capacity": 40
+}
+
+### Listar eventos (público)
+GET {{baseURL}}/events
+Accept: application/json
+
+### Dashboards (qualquer usuário autenticado)
+GET {{baseURL}}/dashboards
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Admin (apenas admin)
+GET {{baseURL}}/admin
+Authorization: Bearer {{token}}
+Accept: application/json
