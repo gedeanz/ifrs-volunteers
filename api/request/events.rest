@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ### 👉 Cole o token no @token abaixo
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU4MTU0MjQwLCJleHAiOjE3NTgxNTc4NDB9.7POTb-4wEFX_bCBkrpiDnEfGqbGj6AgZXm9z6epOHGg
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQGlmcnMuZWR1Iiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzU4MjA5ODgyLCJleHAiOjE3NTgyMTM0ODJ9.IHMRcRssasT7vkMUhSIjlGxPSMklR7Iwx-kypMwRvbs
 
 ### Criar evento (admin)
 POST {{baseURL}}/events
