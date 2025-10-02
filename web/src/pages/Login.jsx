@@ -26,23 +26,59 @@ export default function Login() {
   }
 
   return (
-    <main style={{ maxWidth: 420, margin: '48px auto', padding: 16 }}>
-      <h1>Login</h1>
-      <form onSubmit={onSubmit}>
-        <label>Email<br/>
-          <input value={email} onChange={e=>setEmail(e.target.value)} />
-        </label>
-        <br/><br/>
-        <label>Senha<br/>
-          <input type="password" value={password} onChange={e=>setPassword(e.target.value)} />
-        </label>
-        <br/><br/>
-        <button type="submit">Entrar</button>
-        {error && <p style={{ color:'crimson' }}>{error}</p>}
-        <p style={{ marginTop: 12, fontSize: 12, opacity:.7 }}>
-          Dica: admin@ifrs.edu / 123456 (admin) ou user@ifrs.edu / 123456 (user)
+    <main className="container-sm">
+      <div className="card" style={{ maxWidth: 480, margin: '0 auto' }}>
+        <h1 className="text-center">Login</h1>
+        <p className="text-center text-muted mb-lg">
+          Acesse o sistema IFRS Voluntários
         </p>
-      </form>
+
+        <form onSubmit={onSubmit} className="form">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="form-input"
+              placeholder="seu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Senha
+            </label>
+            <input
+              id="password"
+              type="password"
+              className="form-input"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {error && <div className="alert alert-error">{error}</div>}
+
+          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+            Entrar
+          </button>
+
+          <div className="alert alert-info mt-md">
+            <strong>Credenciais de teste:</strong>
+            <br />
+            Admin: admin@ifrs.edu / 123456
+            <br />
+            User: user@ifrs.edu / 123456
+          </div>
+        </form>
+      </div>
     </main>
   );
 }

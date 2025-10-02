@@ -1,4 +1,4 @@
-﻿@baseURL = http://localhost:3000
+@baseURL = http://localhost:3000
 
 ### Listar eventos
 GET {{baseURL}}/events
@@ -38,7 +38,6 @@ Content-Type: application/json
 ### Listar eventos (público)
 GET {{baseURL}}/events
 Accept: application/json
-
 ### Dashboards (qualquer usuário autenticado)
 GET {{baseURL}}/dashboards
 Authorization: Bearer {{token}}
@@ -48,3 +47,27 @@ Accept: application/json
 GET {{baseURL}}/admin
 Authorization: Bearer {{token}}
 Accept: application/json
+
+### ============================================
+### NOVOS ENDPOINTS - UPDATE e DELETE
+### ============================================
+
+### Buscar evento por ID
+GET {{baseURL}}/events/1
+
+### Atualizar evento (admin)
+PUT {{baseURL}}/events/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Doação de Sangue - ATUALIZADO",
+  "description": "Campanha no Hospital Tacchinni - Atualizada",
+  "event_date": "2025-10-13 09:00:00",
+  "location": "Hospital Tacchinni",
+  "capacity": 100
+}
+
+### Deletar evento (admin)
+DELETE {{baseURL}}/events/4
+Authorization: Bearer {{token}}

@@ -1,16 +1,33 @@
 const jwt = require('jsonwebtoken');
-
-const USERS = [
-  { email: 'admin@ifrs.edu', password: '123456', role: 'admin' },
-  { email: 'user@ifrs.edu',  password: '123456', role: 'user'  },
-];
+const VolunteerModel = require('../models/volunteerModel');
 
 class AuthService {
-  static login(email, password) {
-    const u = USERS.find(x => x.email === email && x.password === password);
-    if (!u) return null;
-    const token = jwt.sign({ email: u.email, role: u.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    return { token, user: { email: u.email, role: u.role } };
+  static async login(email, password) {
+    const volunteer = await VolunteerModel.findByEmail(email);
+    
+    if (!volunteer || volunteer.password !== password) {
+      return null;
+    }
+
+    const token = jwt.sign(
+      { 
+        id: volunteer.id,
+        email: volunteer.email,
+        role: volunteer.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    return {
+      token,
+      user: {
+        id: volunteer.id,
+        name: volunteer.name,
+        email: volunteer.email,
+        role: volunteer.role,
+      },
+    };
   }
 }
 

@@ -47,65 +47,134 @@ export default function Admin() {
     }
   }
 
+  if (!summary) {
+    return (
+      <main className="container">
+        <div className="loading">
+          <div className="spinner"></div>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main style={{ maxWidth: 900, margin: '24px auto', padding: 16 }}>
-      <h1>Admin</h1>
-      {!summary ? (
-        <p>Carregando…</p>
-      ) : (
-        <>
-          <p>
-            Eventos: <strong>{summary.total_events}</strong> | Capacidade total:{' '}
-            <strong>{summary.total_capacity}</strong>
-          </p>
-          <h3 style={{ marginTop: 16 }}>Criar evento</h3>
-          <form onSubmit={createEvent} style={{ display: 'grid', gap: 8, maxWidth: 500 }}>
+    <main className="container">
+      <h1>Painel Administrativo</h1>
+      <p className="text-muted">Gerencie eventos e visualize estatísticas</p>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{summary.total_events}</div>
+          <div className="stat-label">Total de Eventos</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{summary.total_capacity}</div>
+          <div className="stat-label">Capacidade Total</div>
+        </div>
+      </div>
+
+      <div className="card mt-xl">
+        <h3 className="mb-md">Criar Novo Evento</h3>
+
+        <form onSubmit={createEvent} className="form">
+          <div className="form-group">
+            <label htmlFor="title" className="form-label">
+              Título *
+            </label>
             <input
-              placeholder="Título"
+              id="title"
+              className="form-input"
+              placeholder="Ex: Campanha de Doação de Sangue"
               required
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
             />
-            <input
-              placeholder="Descrição"
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description" className="form-label">
+              Descrição
+            </label>
+            <textarea
+              id="description"
+              className="form-textarea"
+              placeholder="Descreva o evento..."
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="date" className="form-label">
+                Data *
+              </label>
               <input
+                id="date"
                 type="date"
+                className="form-input"
                 required
-                aria-label="Data"
                 value={form.date}
                 onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
               />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="time" className="form-label">
+                Horário *
+              </label>
               <input
+                id="time"
                 type="time"
                 step="60"
+                className="form-input"
                 required
-                aria-label="Horário"
                 value={form.time}
                 onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
               />
             </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="location" className="form-label">
+              Local *
+            </label>
             <input
-              placeholder="Local"
+              id="location"
+              className="form-input"
+              placeholder="Ex: Campus Porto Alegre"
               required
               value={form.location}
               onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="capacity" className="form-label">
+              Capacidade (número de vagas)
+            </label>
             <input
-              placeholder="Capacidade"
+              id="capacity"
               type="number"
               min="0"
+              className="form-input"
+              placeholder="0"
               value={form.capacity}
               onChange={(e) => setForm((f) => ({ ...f, capacity: e.target.value }))}
             />
-            <button type="submit">Criar</button>
-          </form>
-          {msg && <p style={{ color: msg.includes('Erro') ? 'crimson' : 'green' }}>{msg}</p>}
-        </>
-      )}
+          </div>
+
+          {msg && (
+            <div className={msg.includes('Erro') ? 'alert alert-error' : 'alert alert-success'}>
+              {msg}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary">
+            Criar Evento
+          </button>
+        </form>
+      </div>
     </main>
   );
 }

@@ -1,0 +1,246 @@
+@baseURL = http://localhost:3000
+
+### ============================================
+### AUTENTICAÇÃO
+### ============================================
+
+### Login como Admin
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ifrs.edu",
+  "password": "123456"
+}
+
+### Login como User
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "carlos@ifrs.edu",
+  "password": "123456"
+}
+
+### Login Inválido
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ifrs.edu",
+  "password": "senhaerrada"
+}
+
+### ============================================
+### CADASTRO PÚBLICO (sem token)
+### ============================================
+
+### Cadastrar novo voluntário (público - não precisa de token)
+POST {{baseURL}}/volunteers
+Content-Type: application/json
+
+{
+  "name": "Carlos Souza",
+  "email": "carlos@ifrs.edu",
+  "phone": "(54) 99999-0010",
+  "password": "123456"
+}
+
+### ============================================
+### VOLUNTEERS (CRUD Completo)
+### ============================================
+
+### IMPORTANTE: Cole o token do admin aqui
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBpZnJzLmVkdSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1OTM2NjAyNSwiZXhwIjoxNzU5MzY5NjI1fQ.nMs9Q2nBwMglb5iDzA5-fKKa1VxhCpbu7aY5cU1H6rE
+
+### Listar todos os voluntários (apenas admin)
+GET {{baseURL}}/volunteers
+Authorization: Bearer {{token}}
+
+### Buscar voluntário por ID (apenas admin)
+GET {{baseURL}}/volunteers/8
+Authorization: Bearer {{token}}
+
+### Atualizar voluntário (apenas admin)
+PUT {{baseURL}}/volunteers/9
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Souza",
+  "email": "admin@ifrs.edu",
+  "phone": "(54) 99999-0010",
+  "password": "12345678"
+}
+
+### Atualizar voluntário com senha (apenas admin)
+PUT {{baseURL}}/volunteers/8
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Carlos Souza",
+  "email": "carlos@ifrs.edu",
+  "phone": "(54) 99999-0005",
+  "role": "admin",
+  "password": "novasenha123"
+}
+
+### Deletar voluntário (apenas admin)
+DELETE {{baseURL}}/volunteers/4
+Authorization: Bearer {{token}}
+
+### Tentar criar voluntário com email duplicado (deve dar erro 409)
+POST {{baseURL}}/volunteers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Teste Duplicado",
+  "email": "admin@ifrs.edu",
+  "phone": "(54) 99999-9999",
+  "role": "user",
+  "password": "123456"
+}
+
+### Tentar acessar sem token (deve dar erro 401)
+GET {{baseURL}}/volunteers
+
+### ============================================
+### TESTES COM USER (não admin)
+### ============================================
+
+### IMPORTANTE: Cole o token do USER aqui (login como user@ifrs.edu)
+@tokenUser = COLE_O_TOKEN_DO_USER_AQUI
+
+### User vendo próprio perfil (deve funcionar - ID 2)
+GET {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenUser}}
+
+### User editando próprio perfil (deve funcionar - ID 2)
+PUT {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenUser}}
+Content-Type: application/json
+
+{
+  "name": "João Pedro Atualizado",
+  "email": "user@ifrs.edu",
+  "phone": "(54) 99999-0002"
+}
+
+### User tentando ver outro perfil (deve dar erro 403)
+GET {{baseURL}}/volunteers/3
+Authorization: Bearer {{tokenUser}}
+
+### User tentando editar outro perfil (deve dar erro 403)
+PUT {{baseURL}}/volunteers/3
+Authorization: Bearer {{tokenUser}}
+Content-Type: application/json
+
+{
+  "name": "Tentando hackear",
+  "email": "maria@ifrs.edu"
+}
+
+### User tentando listar todos (deve dar erro 403)
+GET {{baseURL}}/volunteers
+Authorization: Bearer {{tokenUser}}
+
+### User deletando próprio perfil (deve funcionar - ID 2)
+### ATENÇÃO: Isso vai deletar o usuário! Só teste se quiser remover
+DELETE {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenUser}}
+
+### User tentando deletar outro perfil (deve dar erro 403)
+DELETE {{baseURL}}/volunteers/3
+Authorization: Bearer {{tokenUser}}
+
+### ============================================
+### EVENTS (CRUD Completo)
+### ============================================
+
+### Listar todos os eventos (público)
+GET {{baseURL}}/events
+
+### Buscar evento por ID (público)
+GET {{baseURL}}/events/1
+
+### Criar novo evento (apenas admin)
+POST {{baseURL}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Feira de Adoção de Animais",
+  "description": "Adote um pet e mude uma vida",
+  "event_date": "2025-10-20 14:00:00",
+  "location": "Parque da Redenção",
+  "capacity": 60
+}
+
+### Atualizar evento (apenas admin)
+PUT {{baseURL}}/events/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Doação de Sangue - ATUALIZADO",
+  "description": "Campanha no Hospital Tacchinni - Doe sangue, salve vidas!",
+  "event_date": "2025-10-13 09:00:00",
+  "location": "Hospital Tacchinni",
+  "capacity": 100
+}
+
+### Deletar evento (apenas admin)
+DELETE {{baseURL}}/events/4
+Authorization: Bearer {{token}}
+
+### Tentar criar evento sem campos obrigatórios (deve dar erro 400)
+POST {{baseURL}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Evento Incompleto"
+}
+
+### Tentar atualizar evento inexistente (deve dar erro 404)
+PUT {{baseURL}}/events/999
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Teste",
+  "event_date": "2025-10-20 14:00:00",
+  "location": "Local"
+}
+
+### ============================================
+### DASHBOARDS (Autenticado)
+### ============================================
+
+### Acessar dashboard (qualquer usuário autenticado)
+GET {{baseURL}}/dashboards
+Authorization: Bearer {{token}}
+
+### Tentar acessar dashboard sem token (deve dar erro 401)
+GET {{baseURL}}/dashboards
+
+### ============================================
+### ADMIN (Apenas Admin)
+### ============================================
+
+### Acessar área admin (apenas admin)
+GET {{baseURL}}/admin
+Authorization: Bearer {{token}}
+
+### Tentar acessar admin com token de user (deve dar erro 403)
+GET {{baseURL}}/admin
+Authorization: Bearer {{tokenUser}}
+
+### ============================================
+### HEALTH CHECK
+### ============================================
+
+### Ping (público)
+GET {{baseURL}}/ping

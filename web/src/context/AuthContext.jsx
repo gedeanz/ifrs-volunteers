@@ -4,7 +4,8 @@ const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
-  const [user, setUser]   = useState(null); // { email, role }
+  const [user, setUser] = useState(null); // { email, role }
+  const [loading, setLoading] = useState(true);
 
   // carrega sessão do localStorage ao iniciar
   useEffect(() => {
@@ -12,8 +13,13 @@ export function AuthProvider({ children }) {
     const u = localStorage.getItem('user');
     if (t && u) {
       setToken(t);
-      try { setUser(JSON.parse(u)); } catch { setUser(null); }
+      try {
+        setUser(JSON.parse(u));
+      } catch {
+        setUser(null);
+      }
     }
+    setLoading(false);
   }, []);
 
   const login = ({ token: t, user: u }) => {
@@ -33,9 +39,18 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!token;
   const hasRole = (role) => user?.role === role;
 
-  const value = useMemo(() => ({
-    token, user, isAuthenticated, hasRole, login, logout
-  }), [token, user]);
+  const value = useMemo(
+    () => ({
+      token,
+      user,
+      isAuthenticated,
+      hasRole,
+      login,
+      logout,
+      loading,
+    }),
+    [token, user, loading]
+  );
 
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>;
 }

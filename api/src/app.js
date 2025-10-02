@@ -4,6 +4,7 @@ const helmet = require('helmet');
 
 const authRoutes = require('./routes/authRoutes');
 const eventRoutes = require('./routes/eventRoutes');
+const volunteerRoutes = require('./routes/volunteerRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
@@ -22,6 +23,7 @@ app.get('/ping', (req, res) => res.json({ message: 'pong' }));
 // rotas
 app.use('/auth', authRoutes);
 app.use('/events', eventRoutes);
+app.use('/volunteers', volunteerRoutes);
 app.use('/dashboards', dashboardRoutes);
 app.use('/admin', adminRoutes);
 
