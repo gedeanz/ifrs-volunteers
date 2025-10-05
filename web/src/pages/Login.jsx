@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('admin@ifrs.edu');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const nav = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
 
   const redirectTo = location.state?.from?.pathname || '/dashboards';
+  const wasRedirected = location.state?.from;
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -27,13 +28,19 @@ export default function Login() {
 
   return (
     <main className="container-sm">
+      {wasRedirected && (
+        <div className="alert alert-info" style={{ maxWidth: 480, margin: '0 auto 16px' }}>
+          Faça o login para acessar esta página.
+        </div>
+      )}
+
       <div className="card" style={{ maxWidth: 480, margin: '0 auto' }}>
         <h1 className="text-center">Login</h1>
         <p className="text-center text-muted mb-lg">
           Acesse o sistema IFRS Voluntários
         </p>
 
-        <form onSubmit={onSubmit} className="form">
+        <form onSubmit={onSubmit} className="form auth-form">
           <div className="form-group">
             <label htmlFor="email" className="form-label">
               Email
@@ -42,7 +49,7 @@ export default function Login() {
               id="email"
               type="email"
               className="form-input"
-              placeholder="seu@email.com"
+              placeholder="Digite seu e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -57,7 +64,7 @@ export default function Login() {
               id="password"
               type="password"
               className="form-input"
-              placeholder="••••••••"
+              placeholder="Digite sua senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -70,12 +77,11 @@ export default function Login() {
             Entrar
           </button>
 
-          <div className="alert alert-info mt-md">
-            <strong>Credenciais de teste:</strong>
-            <br />
-            Admin: admin@ifrs.edu / 123456
-            <br />
-            User: user@ifrs.edu / 123456
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <span className="text-muted">Não tem uma conta? </span>
+            <Link to="/register" style={{ fontWeight: 600 }}>
+              Cadastre-se
+            </Link>
           </div>
         </form>
       </div>

@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { LogOut, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
   const { isAuthenticated, hasRole, user, logout } = useAuth();
   const nav = useNavigate();
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -26,11 +27,11 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Extrai primeiro nome do email
-  const getFirstName = (email) => {
-    if (!email) return 'Usuário';
-    const name = email.split('@')[0];
-    return name.charAt(0).toUpperCase() + name.slice(1);
+  // Extrai primeiro nome
+  const getFirstName = (fullName) => {
+    if (!fullName) return 'Usuário';
+    const firstName = fullName.split(' ')[0];
+    return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
   };
 
   // Traduz role
@@ -49,9 +50,17 @@ export default function Header() {
           </span>
         </Link>
         <nav className="header-nav">
-          <Link to="/">Eventos</Link>
-          <Link to="/dashboards">Dashboards</Link>
-          {hasRole('admin') && <Link to="/admin">Admin</Link>}
+          <Link to="/" className={location.pathname === '/' ? 'active' : ''}>
+            Eventos
+          </Link>
+          <Link to="/dashboards" className={location.pathname === '/dashboards' ? 'active' : ''}>
+            Dashboards
+          </Link>
+          {hasRole('admin') && (
+            <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>
+              Admin
+            </Link>
+          )}
         </nav>
         <div className="header-actions">
           {isAuthenticated ? (
@@ -61,13 +70,21 @@ export default function Header() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 <div className="user-info">
-                  <span className="user-name">Olá, {getFirstName(user?.email)}</span>
+                  <span className="user-name">Olá, {getFirstName(user?.name)}</span>
                   <span className="user-role">{getRoleLabel(user?.role)}</span>
                 </div>
                 <span className="dropdown-arrow">▼</span>
               </button>
 
               <div className="user-dropdown-menu">
+                <Link
+                  to="/profile"
+                  className="dropdown-item"
+                  onClick={() => setDropdownOpen(false)}
+                >
+                  <User size={16} />
+                  Meu Perfil
+                </Link>
                 <button className="dropdown-item danger" onClick={onLogout}>
                   <LogOut size={16} />
                   Sair

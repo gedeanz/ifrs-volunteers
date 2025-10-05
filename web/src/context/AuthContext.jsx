@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../lib/api';
 
 const AuthCtx = createContext(null);
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null); // { email, role }
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // carrega sessão do localStorage ao iniciar
   useEffect(() => {
     const t = localStorage.getItem('token');
     const u = localStorage.getItem('user');
@@ -22,18 +24,36 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  const login = ({ token: t, user: u }) => {
-    localStorage.setItem('token', t);
-    localStorage.setItem('user', JSON.stringify(u));
-    setToken(t);
-    setUser(u);
-  };
-
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setToken(null);
     setUser(null);
+  };
+
+  useEffect(() => {
+    const interceptor = api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          const isLoginRequest = error.config?.url?.includes('/auth/login');
+          if (!isLoginRequest) {
+            logout();
+            navigate('/login', { replace: true });
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => api.interceptors.response.eject(interceptor);
+  }, [navigate]);
+
+  const login = ({ token: t, user: u }) => {
+    localStorage.setItem('token', t);
+    localStorage.setItem('user', JSON.stringify(u));
+    setToken(t);
+    setUser(u);
   };
 
   const isAuthenticated = !!token;

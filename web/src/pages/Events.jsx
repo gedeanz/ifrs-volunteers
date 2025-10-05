@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
-import { MapPin, Calendar } from 'lucide-react';
+import { MapPin, Calendar, Check, X } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 
 export default function Events() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [myRegistrations, setMyRegistrations] = useState([]);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    loadEvents();
+    if (isAuthenticated) {
+      loadMyRegistrations();
+    }
+  }, [isAuthenticated]);
+
+  const loadEvents = () => {
     api
       .get('/events')
       .then(({ data }) => {
@@ -17,7 +27,46 @@ export default function Events() {
         console.error(err);
         setLoading(false);
       });
-  }, []);
+  };
+
+  const loadMyRegistrations = () => {
+    api
+      .get('/my-registrations')
+      .then(({ data }) => {
+        setMyRegistrations(data.map(r => r.id));
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  const handleRegister = (eventId) => {
+    api
+      .post(`/events/${eventId}/register`)
+      .then(() => {
+        setMyRegistrations([...myRegistrations, eventId]);
+        loadEvents(); // Recarrega eventos para atualizar contador de vagas
+        alert('Inscrição realizada com sucesso!');
+      })
+      .catch((err) => {
+        alert(err.response?.data?.error || 'Erro ao realizar inscrição');
+      });
+  };
+
+  const handleUnregister = (eventId) => {
+    if (!confirm('Deseja cancelar sua inscrição neste evento?')) return;
+    
+    api
+      .delete(`/events/${eventId}/register`)
+      .then(() => {
+        setMyRegistrations(myRegistrations.filter(id => id !== eventId));
+        loadEvents(); // Recarrega eventos para atualizar contador de vagas
+        alert('Inscrição cancelada com sucesso!');
+      })
+      .catch((err) => {
+        alert(err.response?.data?.error || 'Erro ao cancelar inscrição');
+      });
+  };
 
   if (loading) {
     return (
@@ -50,6 +99,11 @@ export default function Events() {
               minute: '2-digit',
             });
 
+            const isRegistered = myRegistrations.includes(ev.id);
+            const registeredCount = ev.registered_count || 0;
+            const availableSpots = ev.capacity > 0 ? ev.capacity - registeredCount : 0;
+            const isFull = ev.capacity > 0 && availableSpots <= 0;
+
             return (
               <div key={ev.id} className="card">
                 <h3 className="card-title">{ev.title}</h3>
@@ -69,11 +123,36 @@ export default function Events() {
                       </div>
                     </div>
                     {ev.capacity > 0 && (
-                      <div className="badge badge-primary">
-                        {ev.capacity} vagas
+                      <div className={`badge ${isFull ? 'badge-danger' : 'badge-primary'}`}>
+                        {availableSpots} {availableSpots === 1 ? 'vaga' : 'vagas'}
                       </div>
                     )}
                   </div>
+
+                  {isAuthenticated && (
+                    <div style={{ marginTop: '16px' }}>
+                      {isRegistered ? (
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => handleUnregister(ev.id)}
+                          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                        >
+                          <X size={18} />
+                          Cancelar Inscrição
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handleRegister(ev.id)}
+                          disabled={isFull}
+                          style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                        >
+                          <Check size={18} />
+                          {isFull ? 'Esgotado' : 'Inscrever-se'}
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );

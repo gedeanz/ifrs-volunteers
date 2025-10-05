@@ -7,6 +7,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const volunteerRoutes = require('./routes/volunteerRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const registrationRoutes = require('./routes/registrations');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./docs/swagger');
@@ -26,6 +27,7 @@ app.use('/events', eventRoutes);
 app.use('/volunteers', volunteerRoutes);
 app.use('/dashboards', dashboardRoutes);
 app.use('/admin', adminRoutes);
+app.use('/', registrationRoutes);
 
 // swagger ui
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

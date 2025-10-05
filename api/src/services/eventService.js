@@ -22,6 +22,17 @@ class EventService {
       err.status = 400;
       throw err;
     }
+
+    // Valida se a data/hora não está no passado
+    const eventDateTime = new Date(event_date);
+    const now = new Date();
+    
+    if (eventDateTime < now) {
+      const err = new Error('Não é possível criar eventos com data/horário que já passaram');
+      err.status = 400;
+      throw err;
+    }
+
     return EventModel.create(payload);
   }
 

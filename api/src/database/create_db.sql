@@ -25,6 +25,17 @@ CREATE TABLE IF NOT EXISTS volunteers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabela de inscrições em eventos
+CREATE TABLE IF NOT EXISTS event_registrations (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  event_id INT NOT NULL,
+  volunteer_id INT NOT NULL,
+  registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+  FOREIGN KEY (volunteer_id) REFERENCES volunteers(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_registration (event_id, volunteer_id)
+);
+
 -- Seed inicial de eventos
 INSERT INTO events (title, description, event_date, location, capacity) VALUES
 ('Doação de Sangue', 'Campanha no Hospital Tacchinni', '2025-10-13 09:00:00', 'Hospital Tacchinni', 80),

@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const VolunteerModel = require('../models/volunteerModel');
 
 class VolunteerService {
@@ -38,7 +39,8 @@ class VolunteerService {
       throw err;
     }
 
-    return VolunteerModel.create(payload);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return VolunteerModel.create({ ...payload, password: hashedPassword });
   }
 
   static async updateVolunteer(id, payload, requestingUserId, requestingUserRole) {
@@ -70,6 +72,10 @@ class VolunteerService {
         err.status = 409;
         throw err;
       }
+    }
+
+    if (payload.password) {
+      payload.password = await bcrypt.hash(payload.password, 10);
     }
 
     const success = await VolunteerModel.update(id, payload);

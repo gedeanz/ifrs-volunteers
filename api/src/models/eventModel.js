@@ -3,9 +3,19 @@ const db = require("../config/database");
 class EventModel {
   static async findAll() {
     const [rows] = await db.query(
-      `SELECT id, title, description, event_date, location, capacity, created_at
-       FROM events
-       ORDER BY event_date ASC`
+      `SELECT 
+        e.id, 
+        e.title, 
+        e.description, 
+        e.event_date, 
+        e.location, 
+        e.capacity, 
+        e.created_at,
+        COUNT(er.id) as registered_count
+       FROM events e
+       LEFT JOIN event_registrations er ON e.id = er.event_id
+       GROUP BY e.id
+       ORDER BY e.event_date ASC`
     );
     return rows;
   }

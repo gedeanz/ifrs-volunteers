@@ -28,7 +28,7 @@ class VolunteerController {
   static async create(req, res, next) {
     try {
       const created = await VolunteerService.createVolunteer(req.body);
-      res.status(201).json(created);
+      res.status(201).json({ message: 'Voluntário criado com sucesso', data: created });
     } catch (err) {
       next(err);
     }

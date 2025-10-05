@@ -22,7 +22,7 @@ class EventController {
   static async create(req, res, next) {
     try {
       const created = await EventService.createEvent(req.body);
-      res.status(201).json(created);
+      res.status(201).json({ message: 'Evento criado com sucesso', data: created });
     } catch (err) {
       next(err);
     }

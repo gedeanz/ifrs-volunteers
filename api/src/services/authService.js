@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const VolunteerModel = require('../models/volunteerModel');
 
@@ -5,7 +6,12 @@ class AuthService {
   static async login(email, password) {
     const volunteer = await VolunteerModel.findByEmail(email);
     
-    if (!volunteer || volunteer.password !== password) {
+    if (!volunteer) {
+      return null;
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, volunteer.password);
+    if (!isPasswordValid) {
       return null;
     }
 
