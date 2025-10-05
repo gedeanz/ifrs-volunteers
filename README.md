@@ -1,4 +1,4 @@
-﻿# IFRS Volunteers (Repositório Único)
+# IFRS Volunteers (Repositório Único)
 
 Monorepo da Prova P1 com **API (Node/Express/MySQL/JWT/Swagger)** e **Web (React/Vite/Router/Axios)**
 
@@ -31,7 +31,7 @@ Executar o script de criação/seed:
 ```
 api/src/database/create_db.sql
 ```
-> Cria o DB `ifrs_volunteers_db`, as tabelas `events` e `volunteers`, e insere dados de exemplo.
+> Cria o DB `ifrs_volunteers_db`, as tabelas `events`, `volunteers` e `event_registrations`, e insere dados de exemplo.
 
 ---
 
@@ -91,6 +91,9 @@ npm run dev               # sobe em http://localhost:5173
 - `GET /volunteers/:id` — ver **próprio** perfil (user vê apenas seu ID, admin vê qualquer)
 - `PUT /volunteers/:id` — editar **próprio** perfil (user edita apenas seu ID, admin edita qualquer)
 - `DELETE /volunteers/:id` — deletar **próprio** perfil (user deleta apenas seu ID, admin deleta qualquer)
+- `POST /events/:id/register` — **inscrever-se em evento**
+- `DELETE /events/:id/register` — **cancelar inscrição em evento**
+- `GET /my-registrations` — **listar minhas inscrições**
 
 ### 👑 Rotas Admin
 - `GET /volunteers` — listar todos os voluntários
@@ -98,6 +101,7 @@ npm run dev               # sobe em http://localhost:5173
 - `PUT /events/:id` — editar evento
 - `DELETE /events/:id` — deletar evento (retorna `{ message: "Evento removido com sucesso" }`)
 - `GET /admin` — métricas administrativas
+- `GET /events/:id/registrations` — **listar inscritos em um evento**
 
 **Autenticação/Autorização**
 - JWT **Bearer** (header `Authorization: Bearer <token>`)
@@ -116,18 +120,45 @@ npm run dev               # sobe em http://localhost:5173
 
 - **Login** → chama `POST /auth/login`, salva `{token,user}` no **AuthContext** (e no `localStorage`)
 - **Rotas:**
-  - `/` → **Eventos** (público, consome `GET /events`)
+  - `/` → **Eventos** (público, lista eventos com botões de inscrição para usuários logados)
   - `/login` → formulário de login
-  - `/dashboards` → **protegida** (exige login, consome `GET /dashboards`)
-  - `/admin` → **protegida/admin** (exige `role=admin`, consome `GET /admin` e possui form para `POST /events`)
+  - `/register` → cadastro público de voluntários
+  - `/dashboards` → **protegida** (dashboard com estatísticas e minhas inscrições)
+  - `/profile` → **protegida** (perfil do usuário com edição e exclusão de conta)
+  - `/admin` → **protegida/admin** (métricas administrativas)
+  - `/volunteers` → **protegida/admin** (gerenciar voluntários - CRUD completo)
+  - `/events-manage` → **protegida/admin** (gerenciar eventos - CRUD completo)
 - **Guards:** `RequireAuth` e `RequireRole` (React Router)  
 - **Axios:** interceptor adiciona `Authorization: Bearer <token>` automaticamente
-- **Ícones:** Lucide React (componentes `<MapPin>`, `<Calendar>`, `<LogOut>`)
+- **Ícones:** Lucide React (componentes `<MapPin>`, `<Calendar>`, `<LogOut>`, etc)
+
+### Funcionalidades Principais
+
+**Sistema de Inscrições em Eventos:**
+- Usuários logados podem se inscrever/cancelar inscrição em eventos
+- Contador de vagas disponíveis em tempo real
+- Badge dinâmico (verde quando há vagas, vermelho quando esgotado)
+- Botão "Esgotado" desabilitado quando não há vagas
+- Validação de limite de vagas e inscrições duplicadas
+- Dashboard mostra eventos inscritos do usuário
+
+**Gerenciamento Admin:**
+- CRUD completo de eventos (criar, editar, deletar)
+- CRUD completo de voluntários (criar, editar, deletar)
+- Modal de confirmação unificado para exclusões
+- Validação de datas (impede criar eventos no passado)
+- Formulários com validação em tempo real
+
+**Perfil do Usuário:**
+- Visualização e edição de dados pessoais
+- Alteração de senha
+- Exclusão de conta com confirmação
 
 **Estilização**
-- CSS global minimalista (`web/src/index.css`)
-- Variáveis CSS para cores e espaçamentos
-- Design responsivo e acessível
+- CSS global com variáveis CSS (`web/src/styles.css`)
+- Design system consistente (cores IFRS, espaçamentos, tipografia)
+- Layout responsivo com grid
+- Componentes reutilizáveis (cards, modals, forms, alerts)
 
 ---
 
