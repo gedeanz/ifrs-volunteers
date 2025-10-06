@@ -42,9 +42,8 @@ INSERT INTO events (title, description, event_date, location, capacity) VALUES
 ('Mutirão Ambiental', 'Limpeza das principais praças da cidade', '2025-10-15 08:00:00', 'Praça Centenário', 50),
 ('Arrecadação de Alimentos', 'Coleta no campus do IFRS-BG', '2025-10-19 10:00:00', 'Campus IFRS-BG', 100);
 
--- Seed inicial de voluntários (senha: 123456 para todos)
-INSERT INTO volunteers (name, email, phone, role, password) VALUES
-('Administrador', 'admin@ifrs.edu', '(54) 99999-0001', 'admin', '123456'),
-('João Pedro', 'user@ifrs.edu', '(54) 99999-0002', 'user', '123456'),
-('Maria Franz', 'maria@ifrs.edu', '(54) 99999-0003', 'user', '123456'),
-('Pedro Machado', 'pedro@ifrs.edu', '(54) 99999-0004', 'user', '123456');
+-- IMPORTANTE: Ao rodar o projeto pela primeira vez, alguns usuários são criados automaticamente para facilitar, com senhas criptografadas (bcrypt):
+-- admin@ifrs.edu / 123456 (admin)
+-- user@ifrs.edu / 123456 (user)
+-- maria@ifrs.edu / 123456 (user)
+-- pedro@ifrs.edu / 123456 (user)

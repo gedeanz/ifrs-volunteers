@@ -27,11 +27,18 @@ VITE_API_URL=http://localhost:3000
 ```
 
 ## Banco de dados (API)
-Executar o script de criação/seed:
+
+Execute o script SQL no MySQL:
 ```
 api/src/database/create_db.sql
 ```
-> Cria o DB `ifrs_volunteers_db`, as tabelas `events`, `volunteers` e `event_registrations`, e insere dados de exemplo.
+> Cria o DB `ifrs_volunteers_db`, as tabelas `events`, `volunteers` e `event_registrations`, e insere eventos de exemplo.
+
+**Seed automático:** Ao iniciar a API pela primeira vez, os usuários são criados automaticamente com senhas criptografadas (bcrypt):
+- `admin@ifrs.edu` / `123456` (admin)
+- `user@ifrs.edu` / `123456` (user)  
+- `maria@ifrs.edu` / `123456` (user)
+- `pedro@ifrs.edu` / `123456` (user)
 
 ---
 

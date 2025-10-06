@@ -85,6 +85,12 @@ export default function Events() {
         Confira os eventos disponíveis e participe das ações sociais do IFRS
       </p>
 
+      {!isAuthenticated && items.length > 0 && (
+        <div className="alert alert-info" style={{ marginTop: '24px' }}>
+          Faça <a href="/login" style={{ fontWeight: 600, textDecoration: 'underline' }}>login</a> para se inscrever nos eventos.
+        </div>
+      )}
+
       {items.length === 0 ? (
         <div className="alert alert-info mt-lg">
           Nenhum evento cadastrado no momento.
