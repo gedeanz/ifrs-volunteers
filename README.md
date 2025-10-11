@@ -180,53 +180,6 @@ Arquivo REST Client disponível:
 3. Execute cada requisição clicando em "Send Request"
 4. Após o login, copie o token e cole nas variáveis `@token` ou `@tokenUser`
 
-### Exemplo rápido
-
-```http
-@baseURL = http://localhost:3000
-
-### 1. Cadastro público (sem token)
-POST {{baseURL}}/volunteers
-Content-Type: application/json
-
-{
-  "name": "Novo Voluntário",
-  "email": "novo@ifrs.edu",
-  "phone": "(54) 99999-0000",
-  "password": "123456"
-}
-
-### 2. Login
-POST {{baseURL}}/auth/login
-Content-Type: application/json
-
-{
-  "email": "admin@ifrs.edu",
-  "password": "123456"
-}
-
-### 3. Listar eventos (público)
-GET {{baseURL}}/events
-
-### 4. Dashboard (autenticado)
-@token = COLE_O_TOKEN_AQUI
-GET {{baseURL}}/dashboards
-Authorization: Bearer {{token}}
-
-### 5. Criar evento (admin)
-POST {{baseURL}}/events
-Authorization: Bearer {{token}}
-Content-Type: application/json
-
-{
-  "title": "Feira de Adoção",
-  "description": "Adote um pet",
-  "event_date": "2025-10-26 09:00:00",
-  "location": "Praça Centenário",
-  "capacity": 75
-}
-```
-
 ---
 
 ## Documentação Adicional
