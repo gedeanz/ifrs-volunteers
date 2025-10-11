@@ -1,10 +1,23 @@
 const EventModel = require('../models/eventModel');
 
+/**
+ * Service responsável pelas regras de negócio relacionadas a eventos
+ */
 class EventService {
+  /**
+   * Lista todos os eventos cadastrados
+   * @returns {Promise<Array>} Array de eventos com contagem de inscritos
+   */
   static async listEvents() {
     return EventModel.findAll();
   }
 
+  /**
+   * Busca um evento específico por ID
+   * @param {number|string} id - ID do evento
+   * @returns {Promise<Object>} Dados do evento
+   * @throws {Error} Lança erro 404 se evento não for encontrado
+   */
   static async getEventById(id) {
     const event = await EventModel.findById(id);
     if (!event) {
@@ -15,6 +28,17 @@ class EventService {
     return event;
   }
 
+  /**
+   * Cria um novo evento com validações
+   * @param {Object} payload - Dados do evento
+   * @param {string} payload.title - Título do evento (obrigatório)
+   * @param {string} payload.event_date - Data/hora do evento (obrigatório)
+   * @param {string} payload.location - Local do evento (obrigatório)
+   * @param {string} [payload.description] - Descrição do evento
+   * @param {number} [payload.capacity] - Capacidade máxima de participantes
+   * @returns {Promise<Object>} Evento criado
+   * @throws {Error} Lança erro 400 se campos obrigatórios estiverem ausentes ou data inválida
+   */
   static async createEvent(payload) {
     const { title, event_date, location } = payload || {};
     if (!title || !event_date || !location) {
@@ -36,6 +60,18 @@ class EventService {
     return EventModel.create(payload);
   }
 
+  /**
+   * Atualiza um evento existente
+   * @param {number|string} id - ID do evento
+   * @param {Object} payload - Dados atualizados do evento
+   * @param {string} payload.title - Título do evento (obrigatório)
+   * @param {string} payload.event_date - Data/hora do evento (obrigatório)
+   * @param {string} payload.location - Local do evento (obrigatório)
+   * @param {string} [payload.description] - Descrição do evento
+   * @param {number} [payload.capacity] - Capacidade máxima de participantes
+   * @returns {Promise<Object>} Evento atualizado
+   * @throws {Error} Lança erro 400 se campos obrigatórios estiverem ausentes, 404 se não encontrado
+   */
   static async updateEvent(id, payload) {
     const { title, event_date, location } = payload || {};
     if (!title || !event_date || !location) {
@@ -56,6 +92,12 @@ class EventService {
     return this.getEventById(id);
   }
 
+  /**
+   * Remove um evento do sistema
+   * @param {number|string} id - ID do evento
+   * @returns {Promise<void>}
+   * @throws {Error} Lança erro 404 se evento não for encontrado, 500 se falhar ao remover
+   */
   static async deleteEvent(id) {
     await this.getEventById(id);
 

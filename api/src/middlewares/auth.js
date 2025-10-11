@@ -1,5 +1,12 @@
 const jwt = require('jsonwebtoken');
 
+/**
+ * Middleware que verifica se o usuário está autenticado via JWT
+ * @param {Object} req - Objeto de requisição Express
+ * @param {Object} res - Objeto de resposta Express
+ * @param {Function} next - Função para passar para o próximo middleware
+ * @returns {void} Retorna erro 401 se token ausente/inválido, ou injeta req.user e chama next()
+ */
 function authenticate(req, res, next) {
   const auth = req.headers.authorization || '';
   const [scheme, token] = auth.split(' ');
@@ -15,6 +22,11 @@ function authenticate(req, res, next) {
   }
 }
 
+/**
+ * Middleware que verifica se o usuário tem permissão (role) para acessar o recurso
+ * @param {...string} roles - Roles permitidas (ex: 'admin', 'user')
+ * @returns {Function} Middleware Express que retorna erro 403 se sem permissão, ou chama next()
+ */
 function authorize(...roles) {
   return (req, res, next) => {
     if (!req.user?.role || !roles.includes(req.user.role)) {

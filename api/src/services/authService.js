@@ -2,7 +2,18 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const VolunteerModel = require('../models/volunteerModel');
 
+/**
+ * Service responsável pela autenticação e geração de tokens JWT
+ */
 class AuthService {
+  /**
+   * Autentica um voluntário e gera token JWT
+   * @param {string} email - Email do voluntário
+   * @param {string} password - Senha em texto plano
+   * @returns {Promise<Object|null>} Retorna objeto com token e dados do usuário, ou null se credenciais inválidas
+   * @returns {string} return.token - Token JWT válido por 1 hora
+   * @returns {Object} return.user - Dados do usuário (id, name, email, role)
+   */
   static async login(email, password) {
     const volunteer = await VolunteerModel.findByEmail(email);
     

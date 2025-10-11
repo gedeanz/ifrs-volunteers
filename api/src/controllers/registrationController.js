@@ -1,6 +1,19 @@
 const RegistrationService = require('../services/registrationService');
 
+/**
+ * Controller responsável por gerenciar inscrições em eventos
+ */
 class RegistrationController {
+  /**
+   * Inscreve o voluntário autenticado em um evento
+   * @param {Object} req - Objeto de requisição Express
+   * @param {string} req.params.id - ID do evento
+   * @param {Object} req.user - Dados do usuário autenticado (injetado pelo middleware)
+   * @param {number} req.user.id - ID do voluntário
+   * @param {Object} res - Objeto de resposta Express
+   * @param {Function} next - Função para passar erros ao middleware de erro
+   * @returns {Promise<void>} Retorna JSON com mensagem de sucesso (status 201) ou erro 400
+   */
   static async register(req, res, next) {
     try {
       const eventId = parseInt(req.params.id);
@@ -18,6 +31,16 @@ class RegistrationController {
     }
   }
 
+  /**
+   * Cancela a inscrição do voluntário em um evento
+   * @param {Object} req - Objeto de requisição Express
+   * @param {string} req.params.id - ID do evento
+   * @param {Object} req.user - Dados do usuário autenticado
+   * @param {number} req.user.id - ID do voluntário
+   * @param {Object} res - Objeto de resposta Express
+   * @param {Function} next - Função para passar erros ao middleware de erro
+   * @returns {Promise<void>} Retorna JSON com mensagem de sucesso ou erro 400
+   */
   static async unregister(req, res, next) {
     try {
       const eventId = parseInt(req.params.id);
@@ -33,6 +56,15 @@ class RegistrationController {
     }
   }
 
+  /**
+   * Lista todas as inscrições do voluntário autenticado
+   * @param {Object} req - Objeto de requisição Express
+   * @param {Object} req.user - Dados do usuário autenticado
+   * @param {number} req.user.id - ID do voluntário
+   * @param {Object} res - Objeto de resposta Express
+   * @param {Function} next - Função para passar erros ao middleware de erro
+   * @returns {Promise<void>} Retorna JSON com array de inscrições
+   */
   static async getMyRegistrations(req, res, next) {
     try {
       const volunteerId = req.user.id;
@@ -43,6 +75,14 @@ class RegistrationController {
     }
   }
 
+  /**
+   * Lista todos os voluntários inscritos em um evento (apenas admin)
+   * @param {Object} req - Objeto de requisição Express
+   * @param {string} req.params.id - ID do evento
+   * @param {Object} res - Objeto de resposta Express
+   * @param {Function} next - Função para passar erros ao middleware de erro
+   * @returns {Promise<void>} Retorna JSON com array de inscrições do evento
+   */
   static async getEventRegistrations(req, res, next) {
     try {
       const eventId = parseInt(req.params.id);

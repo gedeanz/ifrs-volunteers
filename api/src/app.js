@@ -7,7 +7,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const volunteerRoutes = require('./routes/volunteerRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const registrationRoutes = require('./routes/registrations');
+const registrationRoutes = require('./routes/registrationRoutes');
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./docs/swagger');
@@ -17,9 +17,6 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
-
-// health-check
-app.get('/ping', (req, res) => res.json({ message: 'pong' }));
 
 // rotas
 app.use('/auth', authRoutes);

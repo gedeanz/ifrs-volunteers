@@ -171,9 +171,14 @@ npm run dev               # sobe em http://localhost:5173
 
 ## Testes da API
 
-Arquivos REST Client disponíveis:
-- `api/request/volunteers.rest` — testes completos de CRUD de volunteers e events
-- `api/request/events.rest` — testes básicos de eventos
+Arquivo REST Client disponível:
+- `api/tests/tests.rest` — **suite completa de testes** com todos os endpoints, validações e casos de erro
+
+### Como usar:
+1. Instale a extensão "REST Client" no VS Code
+2. Abra o arquivo `api/tests/tests.rest`
+3. Execute cada requisição clicando em "Send Request"
+4. Após o login, copie o token e cole nas variáveis `@token` ou `@tokenUser`
 
 ### Exemplo rápido
 

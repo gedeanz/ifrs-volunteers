@@ -1,8 +1,17 @@
 const RegistrationModel = require('../models/registrationModel');
 const EventModel = require('../models/eventModel');
 
+/**
+ * Service responsável pelas regras de negócio de inscrições em eventos
+ */
 class RegistrationService {
-
+  /**
+   * Inscreve um voluntário em um evento com validações
+   * @param {number} eventId - ID do evento
+   * @param {number} volunteerId - ID do voluntário
+   * @returns {Promise<Object>} Mensagem de sucesso
+   * @throws {Error} Lança erro se evento não existe, já inscrito ou sem vagas
+   */
   static async register(eventId, volunteerId) {
     // Verifica se evento existe
     const event = await EventModel.findById(eventId);
@@ -26,6 +35,13 @@ class RegistrationService {
     return { message: 'Inscrição realizada com sucesso' };
   }
 
+  /**
+   * Cancela a inscrição de um voluntário em um evento
+   * @param {number} eventId - ID do evento
+   * @param {number} volunteerId - ID do voluntário
+   * @returns {Promise<Object>} Mensagem de sucesso
+   * @throws {Error} Lança erro se não estiver inscrito
+   */
   static async unregister(eventId, volunteerId) {
     const isRegistered = await RegistrationModel.isRegistered(eventId, volunteerId);
     if (!isRegistered) {
@@ -36,11 +52,21 @@ class RegistrationService {
     return { message: 'Inscrição cancelada com sucesso' };
   }
 
+  /**
+   * Lista todas as inscrições de um voluntário
+   * @param {number} volunteerId - ID do voluntário
+   * @returns {Promise<Array>} Array de inscrições com dados dos eventos
+   */
   static async getMyRegistrations(volunteerId) {
     const registrations = await RegistrationModel.getByVolunteer(volunteerId);
     return registrations;
   }
 
+  /**
+   * Lista todos os voluntários inscritos em um evento
+   * @param {number} eventId - ID do evento
+   * @returns {Promise<Array>} Array de inscrições com dados dos voluntários
+   */
   static async getEventRegistrations(eventId) {
     const registrations = await RegistrationModel.getByEvent(eventId);
     return registrations;

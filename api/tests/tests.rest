@@ -1,0 +1,209 @@
+# IFRS VOLUNTEERS - Testes da API
+
+@baseURL = http://localhost:3000
+
+# ----------------------------------------------------
+# AUTENTICAÇÃO
+# ----------------------------------------------------
+
+### Login Admin
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ifrs.edu",
+  "password": "123456"
+}
+
+### Login User
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@ifrs.edu",
+  "password": "123456"
+}
+
+### Login inválido
+POST {{baseURL}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@ifrs.edu",
+  "password": "senhaerrada"
+}
+
+###
+# Colar tokens após fazer login
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBpZnJzLmVkdSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDIwNjIzMywiZXhwIjoxNzYwMjA5ODMzfQ.zPC754CC_kb_cs496K_8pGe9zU1V-cVPXP_Nf5iZJrY
+@tokenUser = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ1c2VyQGlmcnMuZWR1Iiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjAyMDYzNjUsImV4cCI6MTc2MDIwOTk2NX0.IuVXHrmdbqLKKNLtHjXxobEbiShBxXxAfD-e5BPSXmM
+
+# ----------------------------------------------------
+# EVENTOS
+# ----------------------------------------------------
+
+### Listar eventos
+GET {{baseURL}}/events
+
+### Buscar evento por ID
+GET {{baseURL}}/events/1
+
+### Criar evento (admin)
+POST {{baseURL}}/events
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "title": "Feira de Adoção de Animais",
+  "description": "Adote um pet e mude uma vida",
+  "event_date": "2025-10-20 14:00:00",
+  "location": "Parque da Redenção",
+  "capacity": 60
+}
+
+### Atualizar evento (admin)
+PUT {{baseURL}}/events/1
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "title": "Doação de Sangue - ATUALIZADO",
+  "description": "Campanha atualizada",
+  "event_date": "2025-10-13 09:00:00",
+  "location": "Hospital Tacchinni",
+  "capacity": 100
+}
+
+### Deletar evento (admin)
+DELETE {{baseURL}}/events/4
+Authorization: Bearer {{tokenAdmin}}
+
+### User tentando criar evento (sem permissão)
+POST {{baseURL}}/events
+Authorization: Bearer {{tokenUser}}
+Content-Type: application/json
+
+{
+  "title": "Tentativa de Criar Evento",
+  "event_date": "2025-11-01 10:00:00",
+  "location": "Local Teste"
+}
+
+# ----------------------------------------------------
+# VOLUNTÁRIOS
+# ----------------------------------------------------
+
+### Cadastrar voluntário (público)
+POST {{baseURL}}/volunteers
+Content-Type: application/json
+
+{
+  "name": "Carlos Souza",
+  "email": "carlos@ifrs.edu",
+  "phone": "(54) 99999-0010",
+  "password": "123456"
+}
+
+### Listar voluntários (admin)
+GET {{baseURL}}/volunteers
+Authorization: Bearer {{tokenAdmin}}
+
+### Buscar voluntário por ID (admin)
+GET {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenAdmin}}
+
+### Atualizar voluntário (admin)
+PUT {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "name": "João Pedro Atualizado 2",
+  "email": "user@ifrs.edu",
+  "phone": "(54) 99999-0002"
+}
+
+### Deletar voluntário (admin)
+DELETE {{baseURL}}/volunteers/5
+Authorization: Bearer {{tokenAdmin}}
+
+### User tentando listar todos (sem permissão)
+GET {{baseURL}}/volunteers
+Authorization: Bearer {{tokenUser}}
+
+### User vendo próprio perfil
+GET {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenUser}}
+
+### User editando próprio perfil
+PUT {{baseURL}}/volunteers/2
+Authorization: Bearer {{tokenUser}}
+Content-Type: application/json
+
+{
+  "name": "João Pedro Atualizado",
+  "email": "user@ifrs.edu",
+  "phone": "(54) 99999-0099"
+}
+
+### User tentando editar outro perfil (sem permissão)
+PUT {{baseURL}}/volunteers/3
+Authorization: Bearer {{tokenUser}}
+Content-Type: application/json
+
+{
+  "name": "Tentativa de Edição",
+  "email": "maria@ifrs.edu",
+  "phone": "(54) 99999-0003"
+}
+
+# ----------------------------------------------------
+# INSCRIÇÕES EM EVENTOS
+# ----------------------------------------------------
+
+### Inscrever em evento
+POST {{baseURL}}/events/1/register
+Authorization: Bearer {{tokenUser}}
+
+### Cancelar inscrição
+DELETE {{baseURL}}/events/1/register
+Authorization: Bearer {{tokenUser}}
+
+### Listar minhas inscrições
+GET {{baseURL}}/my-registrations
+Authorization: Bearer {{tokenUser}}
+
+### Listar inscritos em evento (admin)
+GET {{baseURL}}/events/1/registrations
+Authorization: Bearer {{tokenAdmin}}
+
+### User tentando ver inscritos (sem permissão)
+GET {{baseURL}}/events/1/registrations
+Authorization: Bearer {{tokenUser}}
+
+# ----------------------------------------------------
+# DASHBOARDS
+# ----------------------------------------------------
+
+### Acessar dashboard com admin
+GET {{baseURL}}/dashboards
+Authorization: Bearer {{tokenAdmin}}
+
+### Acessar dashboard com user
+GET {{baseURL}}/dashboards
+Authorization: Bearer {{tokenUser}}
+
+### Dashboard sem token (sem permissão)
+GET {{baseURL}}/dashboards
+
+# ----------------------------------------------------
+# ADMIN
+# ----------------------------------------------------
+
+### Área admin (apenas admin)
+GET {{baseURL}}/admin
+Authorization: Bearer {{tokenAdmin}}
+
+### User tentando acessar admin (sem permissão)
+GET {{baseURL}}/admin
+Authorization: Bearer {{tokenUser}}

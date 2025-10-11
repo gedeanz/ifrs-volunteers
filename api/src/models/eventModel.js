@@ -1,6 +1,13 @@
 const db = require("../config/database");
 
+/**
+ * Model responsável pelo acesso aos dados de eventos no banco
+ */
 class EventModel {
+  /**
+   * Busca todos os eventos com contagem de inscritos
+   * @returns {Promise<Array>} Array de eventos ordenados por data
+   */
   static async findAll() {
     const [rows] = await db.query(
       `SELECT 
@@ -19,6 +26,16 @@ class EventModel {
     );
     return rows;
   }
+  /**
+   * Cria um novo evento no banco de dados
+   * @param {Object} params - Parâmetros do evento
+   * @param {string} params.title - Título do evento
+   * @param {string} params.description - Descrição do evento
+   * @param {string} params.event_date - Data/hora do evento
+   * @param {string} params.location - Local do evento
+   * @param {number} params.capacity - Capacidade máxima
+   * @returns {Promise<Object>} Evento criado com ID
+   */
   static async create({ title, description, event_date, location, capacity }) {
     const sql = `
       INSERT INTO events (title, description, event_date, location, capacity)
@@ -41,6 +58,11 @@ class EventModel {
       capacity: capacity ?? 0,
     };
   }
+  /**
+   * Busca um evento específico por ID
+   * @param {number|string} id - ID do evento
+   * @returns {Promise<Object|undefined>} Dados do evento ou undefined se não encontrado
+   */
   static async findById(id) {
     const [rows] = await db.execute(
       `SELECT id, title, description, event_date, location, capacity, created_at
@@ -50,6 +72,17 @@ class EventModel {
     return rows[0];
   }
 
+  /**
+   * Atualiza um evento existente
+   * @param {number|string} id - ID do evento
+   * @param {Object} params - Dados atualizados
+   * @param {string} params.title - Título do evento
+   * @param {string} params.description - Descrição do evento
+   * @param {string} params.event_date - Data/hora do evento
+   * @param {string} params.location - Local do evento
+   * @param {number} params.capacity - Capacidade máxima
+   * @returns {Promise<boolean>} true se atualizado com sucesso
+   */
   static async update(
     id,
     { title, description, event_date, location, capacity }
@@ -71,6 +104,11 @@ class EventModel {
     return result.affectedRows === 1;
   }
 
+  /**
+   * Remove um evento do banco de dados
+   * @param {number|string} id - ID do evento
+   * @returns {Promise<boolean>} true se removido com sucesso
+   */
   static async remove(id) {
     const [result] = await db.execute("DELETE FROM events WHERE id = ?", [id]);
     return result.affectedRows === 1;
