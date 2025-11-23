@@ -35,8 +35,8 @@ Content-Type: application/json
 
 ###
 # Colar tokens após fazer login
-@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBpZnJzLmVkdSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MDIwNjIzMywiZXhwIjoxNzYwMjA5ODMzfQ.zPC754CC_kb_cs496K_8pGe9zU1V-cVPXP_Nf5iZJrY
-@tokenUser = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ1c2VyQGlmcnMuZWR1Iiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjAyMDYzNjUsImV4cCI6MTc2MDIwOTk2NX0.IuVXHrmdbqLKKNLtHjXxobEbiShBxXxAfD-e5BPSXmM
+@tokenAdmin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBpZnJzLmVkdSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MzkzOTMxMiwiZXhwIjoxNzYzOTQyOTEyfQ.RI0vpt1b06KZKZWhdmfiuhntwDO-unxZ1uaAP6oKpOU
+@tokenUser = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ1c2VyQGlmcnMuZWR1Iiwicm9sZSI6InVzZXIiLCJpYXQiOjE3NjM5MzkzMjgsImV4cCI6MTc2Mzk0MjkyOH0.me8PXmPN24N6f5p66RVxmVm13LDDNvYYSR3ODCLN4tM
 
 # ----------------------------------------------------
 # EVENTOS
@@ -56,7 +56,7 @@ Content-Type: application/json
 {
   "title": "Feira de Adoção de Animais",
   "description": "Adote um pet e mude uma vida",
-  "event_date": "2025-10-20 14:00:00",
+  "event_date": "2025-11-24 14:00:00",
   "location": "Parque da Redenção",
   "capacity": 60
 }
@@ -69,13 +69,13 @@ Content-Type: application/json
 {
   "title": "Doação de Sangue - ATUALIZADO",
   "description": "Campanha atualizada",
-  "event_date": "2025-10-13 09:00:00",
+  "event_date": "2025-11-24 09:00:00",
   "location": "Hospital Tacchinni",
   "capacity": 100
 }
 
 ### Deletar evento (admin)
-DELETE {{baseURL}}/events/4
+DELETE {{baseURL}}/events/5
 Authorization: Bearer {{tokenAdmin}}
 
 ### User tentando criar evento (sem permissão)

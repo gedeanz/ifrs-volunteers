@@ -1,4 +1,23 @@
-const db = require("../config/database");
+const prisma = require("../config/prisma");
+
+function mapEvent(event, registeredCount) {
+  if (!event) {
+    return undefined;
+  }
+
+  return {
+    id: event.id,
+    title: event.title,
+    description: event.description ?? null,
+    event_date: event.eventDate,
+    location: event.location,
+    capacity: event.capacity,
+    created_at: event.createdAt,
+    ...(typeof registeredCount === "number"
+      ? { registered_count: registeredCount }
+      : {}),
+  };
+}
 
 /**
  * Model responsável pelo acesso aos dados de eventos no banco
@@ -9,22 +28,18 @@ class EventModel {
    * @returns {Promise<Array>} Array de eventos ordenados por data
    */
   static async findAll() {
-    const [rows] = await db.query(
-      `SELECT 
-        e.id, 
-        e.title, 
-        e.description, 
-        e.event_date, 
-        e.location, 
-        e.capacity, 
-        e.created_at,
-        COUNT(er.id) as registered_count
-       FROM events e
-       LEFT JOIN event_registrations er ON e.id = er.event_id
-       GROUP BY e.id
-       ORDER BY e.event_date ASC`
+    const events = await prisma.event.findMany({
+      orderBy: { eventDate: "asc" },
+      include: {
+        _count: {
+          select: { registrations: true },
+        },
+      },
+    });
+
+    return events.map((event) =>
+      mapEvent(event, event._count.registrations)
     );
-    return rows;
   }
   /**
    * Cria um novo evento no banco de dados
@@ -37,26 +52,17 @@ class EventModel {
    * @returns {Promise<Object>} Evento criado com ID
    */
   static async create({ title, description, event_date, location, capacity }) {
-    const sql = `
-      INSERT INTO events (title, description, event_date, location, capacity)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const params = [
-      title,
-      description ?? null,
-      event_date,
-      location,
-      capacity ?? 0,
-    ];
-    const [result] = await db.execute(sql, params);
-    return {
-      id: result.insertId,
-      title,
-      description,
-      event_date,
-      location,
-      capacity: capacity ?? 0,
-    };
+    const event = await prisma.event.create({
+      data: {
+        title,
+        description: description ?? null,
+        eventDate: new Date(event_date),
+        location,
+        capacity: capacity ?? 0,
+      },
+    });
+
+    return mapEvent(event);
   }
   /**
    * Busca um evento específico por ID
@@ -64,12 +70,11 @@ class EventModel {
    * @returns {Promise<Object|undefined>} Dados do evento ou undefined se não encontrado
    */
   static async findById(id) {
-    const [rows] = await db.execute(
-      `SELECT id, title, description, event_date, location, capacity, created_at
-     FROM events WHERE id = ? LIMIT 1`,
-      [id]
-    );
-    return rows[0];
+    const event = await prisma.event.findUnique({
+      where: { id: Number(id) },
+    });
+
+    return mapEvent(event);
   }
 
   /**
@@ -87,21 +92,18 @@ class EventModel {
     id,
     { title, description, event_date, location, capacity }
   ) {
-    const sql = `
-    UPDATE events
-       SET title = ?, description = ?, event_date = ?, location = ?, capacity = ?
-     WHERE id = ?
-  `;
-    const params = [
-      title,
-      description ?? null,
-      event_date,
-      location,
-      capacity ?? 0,
-      id,
-    ];
-    const [result] = await db.execute(sql, params);
-    return result.affectedRows === 1;
+    await prisma.event.update({
+      where: { id: Number(id) },
+      data: {
+        title,
+        description: description ?? null,
+        eventDate: new Date(event_date),
+        location,
+        capacity: capacity ?? 0,
+      },
+    });
+
+    return true;
   }
 
   /**
@@ -110,8 +112,11 @@ class EventModel {
    * @returns {Promise<boolean>} true se removido com sucesso
    */
   static async remove(id) {
-    const [result] = await db.execute("DELETE FROM events WHERE id = ?", [id]);
-    return result.affectedRows === 1;
+    await prisma.event.delete({
+      where: { id: Number(id) },
+    });
+
+    return true;
   }
 }
 

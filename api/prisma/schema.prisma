@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+enum VolunteerRole {
+  admin
+  user
+}
+
+model Event {
+  id            Int                 @id @default(autoincrement())
+  title         String              @db.VarChar(120)
+  description   String?             @db.Text
+  eventDate     DateTime            @map("event_date")
+  location      String              @db.VarChar(120)
+  capacity      Int                 @default(0)
+  createdAt     DateTime            @default(now()) @map("created_at")
+  registrations EventRegistration[]
+  @@map("events")
+}
+
+model Volunteer {
+  id            Int                 @id @default(autoincrement())
+  name          String              @db.VarChar(120)
+  email         String              @unique @db.VarChar(120)
+  phone         String?             @db.VarChar(20)
+  role          VolunteerRole       @default(user)
+  password      String              @db.VarChar(255)
+  createdAt     DateTime            @default(now()) @map("created_at")
+  registrations EventRegistration[]
+  @@map("volunteers")
+}
+
+model EventRegistration {
+  id           Int       @id @default(autoincrement())
+  eventId      Int       @map("event_id")
+  volunteerId  Int       @map("volunteer_id")
+  registeredAt DateTime  @default(now()) @map("registered_at")
+  event        Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  volunteer    Volunteer @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, volunteerId], name: "unique_registration")
+  @@map("event_registrations")
+}

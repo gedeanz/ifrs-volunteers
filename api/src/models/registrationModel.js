@@ -1,4 +1,26 @@
-const db = require('../config/database');
+const prisma = require('../config/prisma');
+
+function mapRegistrationEvent(registration) {
+  return {
+    id: registration.event.id,
+    title: registration.event.title,
+    description: registration.event.description ?? null,
+    event_date: registration.event.eventDate,
+    location: registration.event.location,
+    capacity: registration.event.capacity,
+    registered_at: registration.registeredAt,
+  };
+}
+
+function mapRegistrationVolunteer(registration) {
+  return {
+    id: registration.volunteer.id,
+    name: registration.volunteer.name,
+    email: registration.volunteer.email,
+    phone: registration.volunteer.phone,
+    registered_at: registration.registeredAt,
+  };
+}
 
 /**
  * Model responsável pelo acesso aos dados de inscrições em eventos
@@ -11,11 +33,12 @@ class RegistrationModel {
    * @returns {Promise<Object>} Resultado da inserção
    */
   static async register(eventId, volunteerId) {
-    const [result] = await db.query(
-      'INSERT INTO event_registrations (event_id, volunteer_id) VALUES (?, ?)',
-      [eventId, volunteerId]
-    );
-    return result;
+    return prisma.eventRegistration.create({
+      data: {
+        eventId: Number(eventId),
+        volunteerId: Number(volunteerId),
+      },
+    });
   }
 
 
@@ -26,11 +49,12 @@ class RegistrationModel {
    * @returns {Promise<Object>} Resultado da remoção
    */
   static async unregister(eventId, volunteerId) {
-    const [result] = await db.query(
-      'DELETE FROM event_registrations WHERE event_id = ? AND volunteer_id = ?',
-      [eventId, volunteerId]
-    );
-    return result;
+    return prisma.eventRegistration.deleteMany({
+      where: {
+        eventId: Number(eventId),
+        volunteerId: Number(volunteerId),
+      },
+    });
   }
 
 
@@ -41,11 +65,16 @@ class RegistrationModel {
    * @returns {Promise<boolean>} true se inscrito, false caso contrário
    */
   static async isRegistered(eventId, volunteerId) {
-    const [rows] = await db.query(
-      'SELECT id FROM event_registrations WHERE event_id = ? AND volunteer_id = ?',
-      [eventId, volunteerId]
-    );
-    return rows.length > 0;
+    const registration = await prisma.eventRegistration.findUnique({
+      where: {
+        unique_registration: {
+          eventId: Number(eventId),
+          volunteerId: Number(volunteerId),
+        },
+      },
+    });
+
+    return Boolean(registration);
   }
 
   /**
@@ -54,11 +83,11 @@ class RegistrationModel {
    * @returns {Promise<number>} Total de inscrições
    */
   static async countRegistrations(eventId) {
-    const [rows] = await db.query(
-      'SELECT COUNT(*) as total FROM event_registrations WHERE event_id = ?',
-      [eventId]
-    );
-    return rows[0]?.total || 0;
+    const result = await prisma.eventRegistration.count({
+      where: { eventId: Number(eventId) },
+    });
+
+    return result;
   }
 
   /**
@@ -67,17 +96,19 @@ class RegistrationModel {
    * @returns {Promise<Array>} Array de eventos inscritos ordenados por data
    */
   static async getByVolunteer(volunteerId) {
-    const [rows] = await db.query(
-      `SELECT 
-        e.id, e.title, e.description, e.event_date, e.location, e.capacity,
-        er.registered_at
-       FROM event_registrations er
-       INNER JOIN events e ON er.event_id = e.id
-       WHERE er.volunteer_id = ?
-       ORDER BY e.event_date ASC`,
-      [volunteerId]
-    );
-    return rows;
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { volunteerId: Number(volunteerId) },
+      include: {
+        event: true,
+      },
+      orderBy: {
+        event: {
+          eventDate: 'asc',
+        },
+      },
+    });
+
+    return registrations.map(mapRegistrationEvent);
   }
 
   /**
@@ -86,17 +117,17 @@ class RegistrationModel {
    * @returns {Promise<Array>} Array de voluntários inscritos ordenados por data de inscrição
    */
   static async getByEvent(eventId) {
-    const [rows] = await db.query(
-      `SELECT 
-        v.id, v.name, v.email, v.phone,
-        er.registered_at
-       FROM event_registrations er
-       INNER JOIN volunteers v ON er.volunteer_id = v.id
-       WHERE er.event_id = ?
-       ORDER BY er.registered_at ASC`,
-      [eventId]
-    );
-    return rows;
+    const registrations = await prisma.eventRegistration.findMany({
+      where: { eventId: Number(eventId) },
+      include: {
+        volunteer: true,
+      },
+      orderBy: {
+        registeredAt: 'asc',
+      },
+    });
+
+    return registrations.map(mapRegistrationVolunteer);
   }
 }
 

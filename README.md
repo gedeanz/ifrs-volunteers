@@ -28,15 +28,18 @@ VITE_API_URL=http://localhost:3000
 
 ## Banco de dados (API)
 
-Execute o script SQL no MySQL:
-```
-api/src/database/create_db.sql
-```
-> Cria o DB `ifrs_volunteers_db`, as tabelas `events`, `volunteers` e `event_registrations`, e insere eventos de exemplo.
+Com o Prisma (versão `6.19.0`) não é mais necessário rodar scripts SQL manualmente. Execute os comandos abaixo dentro da pasta `api/`:
 
-**Seed automático:** Ao iniciar a API pela primeira vez, os usuários são criados automaticamente com senhas criptografadas (bcrypt):
+```
+npx prisma migrate dev       # aplica migrations e sincroniza o schema
+npm run seed                 # popula voluntários e eventos padrão
+```
+
+> ⚠️ **Importante:** se precisar reinstalar manualmente, use `npm install --save-dev prisma@6.19.0` e `npm install @prisma/client@6.19.0`. Versões 7.x possuem mudanças que quebram o fluxo configurado para esta prova.
+
+**Seed padrão (`npm run seed`):**
 - `admin@ifrs.edu` / `123456` (admin)
-- `user@ifrs.edu` / `123456` (user)  
+- `user@ifrs.edu` / `123456` (user)
 - `maria@ifrs.edu` / `123456` (user)
 - `pedro@ifrs.edu` / `123456` (user)
 
@@ -72,6 +75,8 @@ npm run dev:web
 ```bash
 cd api
 npm install
+npx prisma migrate dev    # prepara o banco local
+npm run seed              # opcional: dados iniciais
 npm run dev               # sobe em http://localhost:3000
 ```
 

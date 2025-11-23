@@ -1,4 +1,20 @@
-const db = require('../config/database');
+const prisma = require('../config/prisma');
+
+function mapVolunteer(volunteer) {
+  if (!volunteer) {
+    return undefined;
+  }
+
+  return {
+    id: volunteer.id,
+    name: volunteer.name,
+    email: volunteer.email,
+    phone: volunteer.phone,
+    role: volunteer.role,
+    password: volunteer.password,
+    created_at: volunteer.createdAt,
+  };
+}
 
 /**
  * Model responsável pelo acesso aos dados de voluntários no banco
@@ -9,12 +25,14 @@ class VolunteerModel {
    * @returns {Promise<Array>} Array de voluntários ordenados por nome
    */
   static async findAll() {
-    const [rows] = await db.query(
-      `SELECT id, name, email, phone, role, created_at
-       FROM volunteers
-       ORDER BY name ASC`
-    );
-    return rows;
+    const volunteers = await prisma.volunteer.findMany({
+      orderBy: { name: 'asc' },
+    });
+
+    return volunteers.map((volunteer) => {
+      const { password, ...rest } = mapVolunteer(volunteer);
+      return rest;
+    });
   }
 
   /**
@@ -23,14 +41,17 @@ class VolunteerModel {
    * @returns {Promise<Object|undefined>} Dados do voluntário (sem senha) ou undefined se não encontrado
    */
   static async findById(id) {
-    const [rows] = await db.execute(
-      `SELECT id, name, email, phone, role, created_at
-       FROM volunteers
-       WHERE id = ?
-       LIMIT 1`,
-      [id]
-    );
-    return rows[0];
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { id: Number(id) },
+    });
+
+    const mapped = mapVolunteer(volunteer);
+    if (!mapped) {
+      return undefined;
+    }
+
+    const { password, ...rest } = mapped;
+    return rest;
   }
 
   /**
@@ -39,14 +60,11 @@ class VolunteerModel {
    * @returns {Promise<Object|undefined>} Dados do voluntário (com senha) ou undefined se não encontrado
    */
   static async findByEmail(email) {
-    const [rows] = await db.execute(
-      `SELECT id, name, email, phone, role, password, created_at
-       FROM volunteers
-       WHERE email = ?
-       LIMIT 1`,
-      [email]
-    );
-    return rows[0];
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { email },
+    });
+
+    return mapVolunteer(volunteer);
   }
 
   /**
@@ -60,19 +78,19 @@ class VolunteerModel {
    * @returns {Promise<Object>} Voluntário criado com ID
    */
   static async create({ name, email, phone, role, password }) {
-    const sql = `
-      INSERT INTO volunteers (name, email, phone, role, password)
-      VALUES (?, ?, ?, ?, ?)
-    `;
-    const params = [name, email, phone ?? null, role ?? 'user', password];
-    const [result] = await db.execute(sql, params);
-    return {
-      id: result.insertId,
-      name,
-      email,
-      phone,
-      role: role ?? 'user',
-    };
+    const volunteer = await prisma.volunteer.create({
+      data: {
+        name,
+        email,
+        phone: phone ?? null,
+        role: role ?? 'user',
+        password,
+      },
+    });
+
+    const mapped = mapVolunteer(volunteer);
+    const { password: _, ...rest } = mapped;
+    return rest;
   }
 
   /**
@@ -87,24 +105,23 @@ class VolunteerModel {
    * @returns {Promise<boolean>} true se atualizado com sucesso
    */
   static async update(id, { name, email, phone, role, password }) {
-    let sql, params;
+    const dataToUpdate = {
+      name,
+      email,
+      phone: phone ?? null,
+      role: role ?? 'user',
+    };
+
     if (password) {
-      sql = `
-        UPDATE volunteers
-        SET name = ?, email = ?, phone = ?, role = ?, password = ?
-        WHERE id = ?
-      `;
-      params = [name, email, phone ?? null, role ?? 'user', password, id];
-    } else {
-      sql = `
-        UPDATE volunteers
-        SET name = ?, email = ?, phone = ?, role = ?
-        WHERE id = ?
-      `;
-      params = [name, email, phone ?? null, role ?? 'user', id];
+      dataToUpdate.password = password;
     }
-    const [result] = await db.execute(sql, params);
-    return result.affectedRows === 1;
+
+    await prisma.volunteer.update({
+      where: { id: Number(id) },
+      data: dataToUpdate,
+    });
+
+    return true;
   }
 
   /**
@@ -113,8 +130,11 @@ class VolunteerModel {
    * @returns {Promise<boolean>} true se removido com sucesso
    */
   static async remove(id) {
-    const [result] = await db.execute('DELETE FROM volunteers WHERE id = ?', [id]);
-    return result.affectedRows === 1;
+    await prisma.volunteer.delete({
+      where: { id: Number(id) },
+    });
+
+    return true;
   }
 }
 
