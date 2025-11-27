@@ -14,12 +14,11 @@ Monorepo da Prova P1 com **API (Node/Express/MySQL/JWT/Swagger)** e **Web (React
 
 ### `api/.env` (copiar de `.env.example`)
 ```ini
-DB_HOST=localhost
-DB_USER=SEU_USUARIO
-DB_PASSWORD=SEU_SEGREDO
-DB_DATABASE=ifrs_volunteers_db
 PORT=3000
 JWT_SECRET=troque-esta-chave
+LOG_LEVEL=info
+NODE_ENV=development
+DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/ifrs_volunteers_db"
 ```
 ### `web/.env` (copiar de `.env.example`)
 ```bash
@@ -174,16 +173,47 @@ npm run dev               # sobe em http://localhost:5173
 
 ---
 
-## Testes da API
+## Testes da API (Jest, Supertest e REST Client)
 
-Arquivo REST Client disponível:
-- `api/tests/tests.rest` — **suite completa de testes** com todos os endpoints, validações e casos de erro
+- Arquivo REST Client:
+  - `api/tests/tests.rest` — suite de testes manuais com os principais endpoints da API, incluindo cenários de sucesso e erro.
 
-### Como usar:
-1. Instale a extensão "REST Client" no VS Code
-2. Abra o arquivo `api/tests/tests.rest`
-3. Execute cada requisição clicando em "Send Request"
-4. Após o login, copie o token e cole nas variáveis `@token` ou `@tokenUser`
+### Como usar o REST Client
+1. Instale a extensão "REST Client" no VS Code.
+2. Abra o arquivo `api/tests/tests.rest`.
+3. Execute cada requisição clicando em "Send Request".
+4. Após o login, copie o token retornado e cole nas variáveis `@tokenAdmin` ou `@tokenUser` no início do arquivo.
+
+### Testes automatizados com Jest e Supertest (API)
+
+- Estrutura de pastas:
+  - `api/tests/unit/` — testes **unitários** das regras de negócio (ex.: `AuthService`, `EventService`, `RegistrationService`).
+  - `api/tests/integration/` — testes de **integração HTTP** com Supertest para rotas como `/auth/login`, `/events` e `/volunteers`.
+
+- Comandos principais (executar dentro de `api/`):
+  - `npm test` — roda **todas** as suítes (unitários + integração).
+  - `npm run test:unit` — roda apenas os testes unitários em `tests/unit`.
+  - `npm run test:integration` — roda apenas os testes de integração em `tests/integration`.
+
+> 💡 Para os testes de integração, é necessário ter o banco migrado e com dados de seed:
+> ```bash
+> cd api
+> npx prisma migrate dev
+> npm run seed
+> npm run test:integration
+> ```
+
+---
+
+## Logs estruturados da API (Winston)
+
+- Logger configurado em `api/src/config/logger.js`, gerando logs estruturados em JSON para **console** e arquivo `api/logs/app.log`.
+- Middlewares principais em `api/src/middlewares`:
+  - `requestLogger.js` — registra informações de cada requisição HTTP (rota, método, status, tempo de resposta, usuário, etc.).
+  - `errorHandler.js` — tratamento centralizado de erros, retornando sempre `{ error: 'mensagem' }` com o status adequado.
+- Variáveis de ambiente usadas:
+  - `LOG_LEVEL` (ex.: `info`, `warn`, `error`).
+  - `NODE_ENV` (ex.: `development`, `production`) — controla o formato e destino dos logs.
 
 ---
 
