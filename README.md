@@ -205,6 +205,42 @@ npm run dev               # sobe em http://localhost:5173
 
 ---
 
+## Teste E2E (Selenium - Login)
+
+- Arquivo de teste:
+  - `web/tests/e2e/login.test.js` — automatiza **dois cenários** na tela de login:
+    1. Login **inválido** → exibe a mensagem de erro retornada pela API.
+    2. Login **válido** → acessa o dashboard protegido após autenticar com sucesso.
+
+### Como executar o teste E2E
+
+1. Inicie a API e o front-end:
+   ```bash
+   # terminal 1 (API)
+   cd api
+   npm run dev
+
+   # terminal 2 (web)
+   cd web
+   npm run dev
+   ```
+ 2. Em um terceiro terminal, na raiz do projeto, execute:
+   ```bash
+   node web/tests/e2e/login.test.js
+   ```
+ 3. O Selenium abrirá o Chrome e executará automaticamente:
+    - **Cenário 1:** login inválido → deve aparecer no terminal algo como:
+      - `Cenário 1: login inválido → deve exibir mensagem de erro`
+      - `Mensagem de erro exibida corretamente!`
+    - **Cenário 2:** login válido com `user@ifrs.edu` / `123456` → deve aparecer no terminal algo como:
+      - `Cenário 2: login válido → deve navegar para o dashboard`
+      - `Login realizado e dashboard exibido com sucesso!`
+      - `Teste finalizado sem erros!`
+
+> Alguns avisos/erros internos do Chrome ou do WebDriver podem aparecer no terminal (ex.: mensagens de sandbox, métricas de carregamento, etc.), mas **não impactam o resultado do teste**. O importante é que as mensagens acima sejam exibidas.
+
+---
+
 ## Logs estruturados da API (Winston)
 
 - Logger configurado em `api/src/config/logger.js`, gerando logs estruturados em JSON para **console** e arquivo `api/logs/app.log`.

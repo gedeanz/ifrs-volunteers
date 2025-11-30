@@ -42,7 +42,7 @@ export default function Dashboards() {
     <main className="container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
         <div>
-          <h1 style={{ marginBottom: '4px' }}>Dashboard</h1>
+          <h1 id="dashboard-title" data-testid="dashboard-title" style={{ marginBottom: '4px' }}>Dashboard</h1>
           <p className="text-muted" style={{ margin: 0 }}>
             Bem-vindo, <strong>{user.email}</strong>
           </p>

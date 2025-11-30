@@ -71,9 +71,23 @@ export default function Login() {
             />
           </div>
 
-          {error && <div className="alert alert-error">{error}</div>}
+          {error && (
+            <div
+              id="login-error"
+              data-testid="login-error"
+              className="alert alert-error"
+            >
+              {error}
+            </div>
+          )}
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+          <button
+            id="login-submit"
+            data-testid="login-submit"
+            type="submit"
+            className="btn btn-primary"
+            style={{ width: '100%' }}
+          >
             Entrar
           </button>
 
