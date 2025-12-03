@@ -27,12 +27,9 @@ VITE_API_URL=http://localhost:3000
 
 ## Banco de dados (API)
 
-Com o Prisma (versão `6.19.0`) não é mais necessário rodar scripts SQL manualmente. Execute os comandos abaixo dentro da pasta `api/`:
+Com o Prisma (versão `6.19.0`) não é mais necessário rodar scripts SQL manualmente.
 
-```
-npx prisma migrate dev       # aplica migrations e sincroniza o schema
-npm run seed                 # popula voluntários e eventos padrão
-```
+As migrations e o seed da base são executados com os comandos descritos na seção **Como rodar**, onde está o fluxo completo: instalar dependências, aplicar migrations, rodar o seed e subir a API.
 
 > ⚠️ **Importante:** se precisar reinstalar manualmente, use `npm install --save-dev prisma@6.19.0` e `npm install @prisma/client@6.19.0`. Versões 7.x possuem mudanças que quebram o fluxo configurado para esta prova.
 
@@ -56,12 +53,17 @@ Na **raiz** do monorepo:
 # instala dependências de api/ e web/ de uma vez (workspaces)
 npm run install:all
 
-# subir a API (porta 3000)
+# Banco de dados
+cd api # Na pasta api
+npx prisma migrate dev # Cria o banco e popula as tabelas com prisma
+
+# (Na raíz do projeto) subir a API - porta 3000
 npm run dev:api
 
-# em outro terminal: subir o front (porta 5173)
+# (Na raíz do projeto) em outro terminal: subir o front - porta 5173
 npm run dev:web
 ```
+* Se precisar popular o banco manualmente (sem o npx prisma migrate dev), use `npm run seed`.
 
 - Swagger UI: **http://localhost:3000/api-docs**
 - Front: **http://localhost:5173**
@@ -74,10 +76,10 @@ npm run dev:web
 ```bash
 cd api
 npm install
-npx prisma migrate dev    # prepara o banco local
-npm run seed              # opcional: dados iniciais
+npx prisma migrate dev    # Cria o banco e popula as tabelas com prisma
 npm run dev               # sobe em http://localhost:3000
 ```
+* Se precisar popular o banco manualmente (sem o npx prisma migrate dev), use `npm run seed`.
 
 #### Web (front-end)
 ```bash
